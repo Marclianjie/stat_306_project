@@ -297,7 +297,7 @@ qqnorm(res_1, pch = 1, frame = FALSE)
 qqline(res_1, col = "green", lwd = 2)
 ```
 
-## Model Selection IV: Consider Quadratic terms
+## 9. Model Selection IV: Consider Quadratic terms
 
 -   From the previous assessment, we observe that there might be quadratic relationship in the residual that were not accounted for by the current model, but we are not sure which covariate to add a quadratic term
 
@@ -306,7 +306,7 @@ qqline(res_1, col = "green", lwd = 2)
 -   here is a table summarizing the shape of the residual plot and Q-Q plot for each of the model with qudratic terms
 
     | Added Quadratic term(s) | $adj R^2$ | $p$ val | Left-over quadratic pattern in residual plot | Normality violation in Q-Q plot |
-    |-------------|-------------|-------------|---------------------|--------------|
+    |--------------|--------------|--------------|----------------|--------------|
     | $LSTAT^2$               | 0.7406    | 0.000   | moderate                                     | moderate                        |
     | $RM^2$                  | 0.7679    | 0.000   | Low                                          | Low                             |
     | $PTRATIO^2$             | 0.6941    | 0.145   | High                                         | High                            |
@@ -408,7 +408,7 @@ qqnorm(res_5, pch = 1, frame = FALSE)
 qqline(res_5, col = "green", lwd = 2)
 ```
 
-## 9. Model fit diagnosis II
+## 10. Model fit diagnosis II
 
 -   for the second step of model fit diagonsis, we plotted sequantial residual to check for violation for independent assumption
 
@@ -419,7 +419,7 @@ plot(head(res_2,99), tail(res_2,99),
      xlab="e(i)", ylab="e(i+1)", cex=1.5, cex.lab=1.5, pch=16)
 ```
 
-## 10. Current Final Model
+## 11. Current Final Model
 
 ```{r}
 summary(add_quad_RM)
