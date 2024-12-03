@@ -242,7 +242,7 @@ final_forward_model <- lm(MEDV ~ LSTAT + RM + PTRATIO + B + CHAS, data = data)
 
 ## 7. Model Selection III: Model Comparison based on $C_p$ & adj $R^2$
 
--   Now we have selected one model using backward selection and one model using forward selection. Thus, we are going to compare them using Mallows**\'** $C_p$ statistic and adjusted $R^2$ since they have different number of covariates
+-   Now we have selected one model using backward selection and one model using forward selection. Thus, we are going to compare them using Mallows**'** $C_p$ statistic and adjusted $R^2$ since they have different number of covariates
 
 -   Below is a table representing the $C_p$ statistics and adjusted $R^2$ for each model
 
@@ -251,7 +251,7 @@ final_forward_model <- lm(MEDV ~ LSTAT + RM + PTRATIO + B + CHAS, data = data)
     | Forward Final Model  | 26.13          | 0.6934         |
     | Backward Final Model | 12.24          | 0.7048         |
 
--   From the table above, we observe that the forward final model has a worse $C_p$ than backward final model, but forward final model has a similar adjusted $R^2$ and fewer parameters (covariates) with 5 covariates (compare to 10 in backward selection model), Therefore we decided to use the forward selection model.
+-   From the table above, we observe that the forward final model has a worse $C_p$ than backward final model, but forward final model has a similar adjusted $R^2$ and fewer parameters (covariates) with 5 covariates (compare to 10 in backward selection model), Therefore we decided to use the forward selection model by the principle of parsimony
 
 ```{r}
 # Calculate Cp for each models
@@ -297,7 +297,7 @@ qqnorm(res_1, pch = 1, frame = FALSE)
 qqline(res_1, col = "green", lwd = 2)
 ```
 
-## Model Selection IV: Consider Quadratic terms 
+## Model Selection IV: Consider Quadratic terms
 
 -   From the previous assessment, we observe that there might be quadratic relationship in the residual that were not accounted for by the current model, but we are not sure which covariate to add a quadratic term
 
@@ -306,7 +306,7 @@ qqline(res_1, col = "green", lwd = 2)
 -   here is a table summarizing the shape of the residual plot and Q-Q plot for each of the model with qudratic terms
 
     | Added Quadratic term(s) | $adj R^2$ | $p$ val | Left-over quadratic pattern in residual plot | Normality violation in Q-Q plot |
-    |---------------------|--------|--|--------------------------------|------------------------|
+    |-------------|-------------|-------------|---------------------|--------------|
     | $LSTAT^2$               | 0.7406    | 0.000   | moderate                                     | moderate                        |
     | $RM^2$                  | 0.7679    | 0.000   | Low                                          | Low                             |
     | $PTRATIO^2$             | 0.6941    | 0.145   | High                                         | High                            |
@@ -419,7 +419,7 @@ plot(head(res_2,99), tail(res_2,99),
      xlab="e(i)", ylab="e(i+1)", cex=1.5, cex.lab=1.5, pch=16)
 ```
 
-## 10. Current Final Model 
+## 10. Current Final Model
 
 ```{r}
 summary(add_quad_RM)
