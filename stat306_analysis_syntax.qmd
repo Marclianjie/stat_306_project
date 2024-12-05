@@ -35,10 +35,10 @@ any(is.na(data))
 ## 2. Summary Statistics
 
 1.  we used `describe` function from `psych` package to present the summary statistics of the columns of the dataset in a table format
-2.  The output of `descrive` is a table with rows as the variables in our data and columns representing the summary statistics of each variables. In this table, we mainly looks at the `mean`, `sd`, `min`, `max`,`range`, and there are no particular irregular patterns of concerns
-3.  In this dataset, we have 14 variables in total and 12 of which are pure continous variables
-    1.  `RAD`: how easy to access highways from the neighborhood being a [ordinal varianle,]{.underline} since it has 24 "levels" ordered by how easy it is to access highway from a neighborhood, by the principle of parsimony, we decided to consider `RAD` as a continous variables.
-    2.  `CHAS`: is a categorical variables representing if land touches Charles River, which is represented as a dummy variables (1 if yes; 0 otherwise)
+2.  The output of `describe` is a table with rows as the variables in our data and columns representing the summary statistics of each variables. In this table, we mainly looks at the `mean`, `sd`, `min`, `max`, `range`, and there are no particular irregular patterns of concerns
+3.  In this dataset, we have 14 variables in total and 12 of which are pure continuous variables
+    1.  `RAD`: how easy to access highways from the neighborhood being a [ordinal variable,]{.underline} since it has 24 "levels" ordered by how easy it is to access highway from a neighborhood, by the principle of parsimony, we decided to consider `RAD` as a continuous variables.
+    2.  `CHAS`: is a categorical variable representing if land touches Charles River, which is represented as a dummy variables (1 if yes; 0 otherwise)
 
 ```{r}
 library(psych)
@@ -49,12 +49,12 @@ describe(data)
 
 1.  By the research interest in introduction and proposal, we would like to ask what is the relationship between some factors and the median price of owner-occupied homes in Boston neighborhoods, we have `MEDV` as our respond variable
 2.  Therefore, we would like to first assess the linear relationship between each of potential covariates and the response variable `MEDV`
-    1.  For continous variables
+    1.  For continuous variables
         1.  we first use `cor()` to look at the correlations between each continuous covariates and `MEDV` and found that most of the correlations are between 0.30 and 0.73 with `DIS` being 0.24 which is a low correlation, signaling a low linear relatedness. `DIS` represents the distance from five Boston employment centers
-        2.  we then used scaterplots between each of the continous covariates and the response variable `MEDV` to visualize the relationship and assess the linearity. Out of which, the plots between `DIS` and our reponse vaeriable `MEDV` is mostly random with no obvious linear relationship (nor higher power linearity)
+        2.  we then used scatterplots between each of the continyous covariates and the response variable `MEDV` to visualize the relationship and assess the linearity. Out of which, the plots between `DIS` and our response variable `MEDV` is mostly random with no obvious linear relationship (nor higher power linearity)
         3.  we decided to **drop the variable** `DIS` at this early stage due to its lack of linearity quantitatively and visually. Every other continuous variable has shown a relatively mediate to large correlation, which is meaningful to include in a linear model
     2.  For categorical variable
-        1.  we use a boxplot to assess if there is difference between the two categories, and from the boxplot, we see that the Median prices of the neighborhood that is near Charles lake (`CHAS` = 1) is in general higher than the neighborhoods that is not near Charles lake (`CHAS` = 0). So it is meaningfule to include `CHAS` in a linear model.
+        1.  we use a boxplot to assess if there is difference between the two categories, and from the boxplot, we see that the Median prices of the neighborhood that is near Charles lake (`CHAS` = 1) is in general higher than the neighborhoods that is not near Charles lake (`CHAS` = 0). So it is meaningful to include `CHAS` in a linear model.
 
 ```{r}
 library(ggplot2)
@@ -93,8 +93,8 @@ data <- data[colnames(data) != "DIS"]
 
 ## 4. Assess the **Multicollinearity** of the continuous covariates
 
-1.  We suspect that some of the continous variables might be similar to each other and cause a multicollinearity issue of our linear model, therefore we first do a correlation tables with upper diagonal being the correlation values and the lower diagonal being the scaterplots using `ggpairs` function from `GGally` package.
-    1.  from the result tables, we observe that there are some high pair-wise correlation between the continous covariates, for example, cor(TAX, RAD) = 0.910, cor(NOX, INDUS) = 0.763, cor(NOX, AGE) = 0.737, which signal a potential issue of multicolinearity, therefore we decided to check the Variance Inflation Factor (VIF) in the model (with all potential covariates)
+1.  We suspect that some of the continuous variables might be similar to each other and cause a multicollinearity issue of our linear model, therefore we first do a correlation tables with upper diagonal being the correlation values and the lower diagonal being the scatterplots using `ggpairs` function from `GGally` package.
+    1.  from the result tables, we observe that there are some high pair-wise correlation between the continuous covariates, for example, cor(TAX, RAD) = 0.910, cor(NOX, INDUS) = 0.763, cor(NOX, AGE) = 0.737, which signal a potential issue of multicollinearity, therefore we decided to check the Variance Inflation Factor (VIF) in the model (with all potential covariates)
     2.  Then we fit a model with all potential covariates and use `vif` function from the `car` package to get the VIF for each covariates in this model. Surprisingly, none of which has a VIF of \>= 10, which means that multicollinearity is not a very serious issue for the model. Therefore we decided not to drop any covariate and proceed with the current set of covariates
 
 ```{r}
@@ -112,8 +112,9 @@ suppressWarnings(suppressMessages({
     upper = list(continuous = "cor"),
     lower = list(continuous = "points"),
     diag = list(continuous = "densityDiag"),
-    title = "Correlations and Scatterplots Between Continous Covariates"
-  )
+    title = "Correlations and Scatterplots Between Continuous Covariates"
+  ) + 
+    theme(axis.text.x = element_text(angle = -90, hjust = 0))
 
   print(plot)
 }))
@@ -128,6 +129,8 @@ vif_values
 ## 5. Model Selection I: Backward Selection
 
 -   Now after basic checking on summary statistics and multicollinearity issue, we start the Model selection step. we first did a backward selection to select the best backward model based on p-values of the coefficients for each potential covariates
+
+-   We use a alpha value of 0.05 for this process
 
 -   Below is the table representing the covariates that are dropped in the backward selection (in order of being dropped) and their corresponding $p$-values:
 
@@ -244,15 +247,6 @@ final_forward_model <- lm(MEDV ~ LSTAT + RM + PTRATIO + B + CHAS, data = data)
 
 -   Now we have selected one model using backward selection and one model using forward selection. Thus, we are going to compare them using Mallows**'** $C_p$ statistic and adjusted $R^2$ since they have different number of covariates
 
--   Below is a table representing the $C_p$ statistics and adjusted $R^2$ for each model
-
-    | Models               | Mallow's $C_p$ | Adjusted $R^2$ |
-    |----------------------|----------------|----------------|
-    | Forward Final Model  | 26.13          | 0.6934         |
-    | Backward Final Model | 12.24          | 0.7048         |
-
--   From the table above, we observe that the forward final model has a worse $C_p$ than backward final model, but forward final model has a similar adjusted $R^2$ and fewer parameters (covariates) with 5 covariates (compare to 10 in backward selection model), Therefore we decided to use the forward selection model by the principle of parsimony
-
 ```{r}
 # Calculate Cp for each models
 full_model <- backward_models[[1]]
@@ -272,11 +266,20 @@ cp_forward
 
 ```
 
+-   Below is a table representing the $C_p$ statistics and adjusted $R^2$ for each model
+
+    | Models               | Mallow's $C_p$ | Adjusted $R^2$ |
+    |----------------------|----------------|----------------|
+    | Forward Final Model  | 26.13          | 0.6934         |
+    | Backward Final Model | 12.24          | 0.7048         |
+
+-   From the table above, we observe that the forward final model has a worse $C_p$ than backward final model, but forward final model has a similar adjusted $R^2$ and fewer parameters (covariates) with 5 covariates (compare to 10 in backward selection model), Therefore we decided to use the forward selection model by the principle of parsimony
+
 ## 8. Model fit diagnosis I
 
 1.  to assess the model fit of the chosen model, we first did a residual plot
-    1.  from the residual plot, we see that the range of our residuals are too far apart, there are several very large residuals and most of the residuals are around -10 to 10, hard to seperate one from the other
-2.  to assess the normality assumption violation, we did a Q-Q plot and observe there is a slightly off the straight line especially in the upper end (a skewness), which signals a violation of the normality assmption
+    1.  from the residual plot, we see that the range of our residuals are too far apart, there are several very large residuals and most of the residuals are around -10 to 10, hard to separate one from the other
+2.  to assess the normality assumption violation, we did a Q-Q plot and observe there is a slightly off the straight line especially in the upper end (a skewness), which signals a violation of the normality assumption
 3.  to solve the above issue, we consider perform a log-transformation of the response variable `MEDV` to normalize the residual and bring the scale(range) of our residual smaller
 
 ```{r}
@@ -326,9 +329,9 @@ qqline(res_log, col = "green", lwd = 2)
 
 ## Model fit diagnosis II
 
--   for the second step of model fit diagonsis, we plotted sequantial residual to check for violation for independent assumption
+-   for the second step of model fit diagnosis, we plotted sequential residual to check for violation for independent assumption
 
-    -   from the graph below, the residuals seems to be random and no clear patten, signalling no obvious violation for independent assumption.
+    -   from the graph below, the residuals seems to be random and no clear pattern, signalling no obvious violation for independent assumption.
 
 ```{r}
 plot(head(res_log,99), tail(res_log,99),
