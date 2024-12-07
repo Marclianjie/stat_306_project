@@ -315,7 +315,7 @@ summary(log_model)
 
 res_log <- resid(log_model)
 fitted_log <- fitted(log_model)
-res_plot_log<-ggplot(data,aes(y=res_log,x=fitted_3))+
+res_plot_log<-ggplot(data,aes(y=res_log,x=fitted_log))+
   geom_point()+
   ylab("Residuals")+
   xlab("Fitted Values")+
