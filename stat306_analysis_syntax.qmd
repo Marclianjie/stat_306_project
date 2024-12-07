@@ -9,7 +9,7 @@ editor: visual
 ## 1. Data Cleaning
 
 1.  Each observation in the original dataset `boston.txt` is split across two lines, we preprocessed the data by `readLines()` and combine every two lines into one rows.
-2.  The origional dataset contains 22 rows of metadata and no headers, we skipped 22 rows when reading the data and we named it `data` and added headers afterwards using `colnames(data)`
+2.  The original dataset contains 22 rows of metadata and no headers, we skipped 22 rows when reading the data and we named it `data` and added headers afterwards using `colnames(data)`
 3.  we then use `any(is.na(data))` to check if there is any NA in any rows, and there is no NA in our data.
 
 Thus we have our cleaned dataset of `data`
@@ -51,7 +51,7 @@ describe(data)
 2.  Therefore, we would like to first assess the linear relationship between each of potential covariates and the response variable `MEDV`
     1.  For continuous variables
         1.  we first use `cor()` to look at the correlations between each continuous covariates and `MEDV` and found that most of the correlations are between 0.30 and 0.73 with `DIS` being 0.24 which is a low correlation, signaling a low linear relatedness. `DIS` represents the distance from five Boston employment centers
-        2.  we then used scatterplots between each of the continyous covariates and the response variable `MEDV` to visualize the relationship and assess the linearity. Out of which, the plots between `DIS` and our response variable `MEDV` is mostly random with no obvious linear relationship (nor higher power linearity)
+        2.  we then used scatterplots between each of the continuous covariates and the response variable `MEDV` to visualize the relationship and assess the linearity. Out of which, the plots between `DIS` and our response variable `MEDV` is mostly random with no obvious linear relationship (nor higher power linearity)
         3.  we decided to **drop the variable** `DIS` at this early stage due to its lack of linearity quantitatively and visually. Every other continuous variable has shown a relatively mediate to large correlation, which is meaningful to include in a linear model
     2.  For categorical variable
         1.  we use a boxplot to assess if there is difference between the two categories, and from the boxplot, we see that the Median prices of the neighborhood that is near Charles lake (`CHAS` = 1) is in general higher than the neighborhoods that is not near Charles lake (`CHAS` = 0). So it is meaningful to include `CHAS` in a linear model.
@@ -175,6 +175,11 @@ backward_models[[3]] = lm(MEDV ~ . - ZN - INDUS, data = data)
 summary(backward_models[[3]] )
 
 final_backward_model <- lm(MEDV ~ . - ZN - INDUS, data = data)
+
+ggplot() +
+  geom_point(aes(x=final_backward_model$fitted.values, y=final_backward_model$residuals)) +
+  geom_hline(yintercept = 0) +
+  labs(x="Fitted values ($)", y="Residuals ($)", title="Backward model residual plot")
 ```
 
 ## 6. Model Selection II: Forward Selection
@@ -241,6 +246,11 @@ cat("\nFinal model formula:", deparse(final_formula), "\n")
 summary(final_model)
 
 final_forward_model <- lm(MEDV ~ LSTAT + RM + PTRATIO + B + CHAS, data = data)
+
+ggplot() +
+  geom_point(aes(x=final_forward_model$fitted.values, y=final_forward_model$residuals)) +
+  geom_hline(yintercept = 0) +
+  labs(x="Fitted values ($)", y="Residuals ($)", title="Forward model residual plot")
 ```
 
 ## 7. Model Selection III: Model Comparison based on $C_p$ & adj $R^2$
@@ -319,7 +329,7 @@ res_plot_log<-ggplot(data,aes(y=res_log,x=fitted_log))+
   geom_point()+
   ylab("Residuals")+
   xlab("Fitted Values")+
-  ggtitle("Resisduals vs Fitted Values")+
+  ggtitle("Residuals vs Fitted Values")+
   geom_hline(yintercept = 0)
 res_plot_log
 qqnorm(res_log, pch = 1, frame = FALSE)
